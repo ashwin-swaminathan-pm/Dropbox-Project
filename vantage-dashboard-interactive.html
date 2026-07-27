@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vantage — AI Utilization &amp; ROI (Interactive Prototype)</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page-bg: #F3F6F5; --surface: #FFFFFF; --surface-inset: #EEF2F1; --rail-bg: #FFFFFF;
+    --ink: #0E1513; --ink-secondary: #4B5854; --ink-muted: #83908C;
+    --border: rgba(14,21,19,0.10); --border-strong: rgba(14,21,19,0.16); --gridline: #E2E7E5;
+    --accent: #0E6F63; --accent-strong: #0A5850; --accent-soft: #E3F2EF; --accent-ink: #FFFFFF;
+
+    --seq-100: #cde2fb; --seq-150: #b7d3f6; --seq-200: #9ec5f4; --seq-250: #86b6ef;
+    --seq-300: #6da7ec; --seq-350: #5598e7; --seq-400: #3987e5; --seq-450: #2a78d6;
+    --seq-500: #256abf; --seq-550: #1c5cab; --seq-600: #184f95; --seq-650: #104281; --seq-700: #0d366b;
+
+    --cat-1: #2a78d6; --cat-2: #eb6834; --cat-3: #1baf7a; --cat-4: #eda100;
+    --cat-5: #e87ba4; --cat-6: #008300; --cat-7: #4a3aa7; --cat-8: #e34948;
+
+    --status-good: #0ca30c; --status-warning: #fab219; --status-serious: #ec835a; --status-critical: #d03b3b;
+    --status-good-text: #006300;
+
+    --chart-surface: #fcfcfb;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page-bg: #0A1110; --surface: #101817; --surface-inset: #16201E; --rail-bg: #0D1413;
+      --ink: #F3F6F5; --ink-secondary: #A9B6B2; --ink-muted: #6C7975;
+      --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.16); --gridline: #1E2B29;
+      --accent: #3FBFAE; --accent-strong: #63D6C6; --accent-soft: rgba(63,191,174,0.14); --accent-ink: #06110F;
+      --seq-100: #0d366b; --seq-150: #104281; --seq-200: #184f95; --seq-250: #1c5cab;
+      --seq-300: #256abf; --seq-350: #2a78d6; --seq-400: #3987e5; --seq-450: #5598e7;
+      --seq-500: #6da7ec; --seq-550: #86b6ef; --seq-600: #9ec5f4; --seq-650: #b7d3f6; --seq-700: #cde2fb;
+      --cat-1: #3987e5; --cat-2: #d95926; --cat-3: #199e70; --cat-4: #c98500;
+      --cat-5: #d55181; --cat-6: #1fae1f; --cat-7: #9085e9; --cat-8: #e66767;
+      --status-good: #0ca30c; --status-warning: #fab219; --status-serious: #ec835a; --status-critical: #d03b3b;
+      --status-good-text: #0ca30c; --chart-surface: #1a1a19;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page-bg: #0A1110; --surface: #101817; --surface-inset: #16201E; --rail-bg: #0D1413;
+    --ink: #F3F6F5; --ink-secondary: #A9B6B2; --ink-muted: #6C7975;
+    --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.16); --gridline: #1E2B29;
+    --accent: #3FBFAE; --accent-strong: #63D6C6; --accent-soft: rgba(63,191,174,0.14); --accent-ink: #06110F;
+    --seq-100: #0d366b; --seq-150: #104281; --seq-200: #184f95; --seq-250: #1c5cab;
+    --seq-300: #256abf; --seq-350: #2a78d6; --seq-400: #3987e5; --seq-450: #5598e7;
+    --seq-500: #6da7ec; --seq-550: #86b6ef; --seq-600: #9ec5f4; --seq-650: #b7d3f6; --seq-700: #cde2fb;
+    --cat-1: #3987e5; --cat-2: #d95926; --cat-3: #199e70; --cat-4: #c98500;
+    --cat-5: #d55181; --cat-6: #1fae1f; --cat-7: #9085e9; --cat-8: #e66767;
+    --status-good: #0ca30c; --status-warning: #fab219; --status-serious: #ec835a; --status-critical: #d03b3b;
+    --status-good-text: #0ca30c; --chart-surface: #1a1a19;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page-bg: #F3F6F5; --surface: #FFFFFF; --surface-inset: #EEF2F1; --rail-bg: #FFFFFF;
+    --ink: #0E1513; --ink-secondary: #4B5854; --ink-muted: #83908C;
+    --border: rgba(14,21,19,0.10); --border-strong: rgba(14,21,19,0.16); --gridline: #E2E7E5;
+    --accent: #0E6F63; --accent-strong: #0A5850; --accent-soft: #E3F2EF; --accent-ink: #FFFFFF;
+    --chart-surface: #fcfcfb;
+  }
+
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--page-bg); color: var(--ink); font-family: var(--font-ui); font-size: 13px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  button, select, input { font-family: inherit; }
+
+  .app { display: grid; grid-template-columns: 236px 1fr; min-height: 100vh; }
+
+  .rail { background: var(--rail-bg); border-right: 1px solid var(--border); padding: 20px 14px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .brand { display: flex; align-items: center; gap: 9px; padding: 0 6px; }
+  .brand-mark { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: flex; align-items: center; justify-content: center; flex: none; }
+  .brand-mark svg { width: 15px; height: 15px; }
+  .brand-name { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+  .brand-sub { font-size: 10.5px; color: var(--ink-muted); letter-spacing: 0.03em; text-transform: uppercase; margin-top: 1px; }
+
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); padding: 0 10px; margin: 4px 0 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: var(--ink-secondary); text-decoration: none; font-size: 12.8px; font-weight: 560; cursor: pointer; border: 1px solid transparent; background: none; text-align: left; width: 100%; }
+  .nav-item .n { width: 16px; height: 16px; border-radius: 4px; background: var(--surface-inset); color: var(--ink-muted); font-size: 9.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; font-family: var(--font-mono); }
+  .nav-item:hover { background: var(--surface-inset); color: var(--ink); }
+  .nav-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
+  .nav-item.active .n { background: var(--accent); color: var(--accent-ink); }
+
+  .rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+  .rail-status { border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 11px; color: var(--ink-secondary); display: flex; flex-direction: column; gap: 6px; }
+  .rail-status-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .coverage-track { height: 4px; border-radius: 2px; background: var(--gridline); overflow: hidden; }
+  .coverage-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+  .legend-strip { display: flex; flex-direction: column; gap: 5px; }
+  .legend-strip-row { display: flex; align-items: center; gap: 7px; font-size: 10.6px; color: var(--ink-secondary); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+  .main { min-width: 0; }
+  .topbar { position: sticky; top: 0; z-index: 5; background: var(--page-bg); padding: 16px 26px 12px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+  .topbar-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .page-title { font-size: 19px; font-weight: 700; letter-spacing: -0.015em; text-wrap: balance; }
+  .page-sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .wf-badge { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink-muted); border: 1px dashed var(--border-strong); border-radius: 6px; padding: 3px 7px; text-transform: uppercase; white-space: nowrap; }
+  .filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .filter-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-strong); background: var(--surface); border-radius: 999px; padding: 6px 11px 6px 12px; font-size: 12px; color: var(--ink-secondary); cursor: pointer; font-weight: 550; }
+  .filter-chip:hover { border-color: var(--accent); color: var(--ink); }
+  .filter-chip svg { width: 11px; height: 11px; opacity: 0.6; }
+  .filter-chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+  .filter-divider { width: 1px; height: 18px; background: var(--border-strong); margin: 0 2px; }
+  .filter-reset { font-size: 11.5px; color: var(--accent); font-weight: 650; background: none; border: none; cursor: pointer; padding: 4px 2px; }
+  .ctrl-select { appearance: none; -webkit-appearance: none; border: 1px solid var(--border-strong); background-color: var(--surface); background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234B5854"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; background-size: 12px; border-radius: 9px; padding: 8px 30px 8px 12px; font-size: 12.5px; font-weight: 650; color: var(--ink); cursor: pointer; }
+  .ctrl-select:hover { border-color: var(--accent); }
+  .ctrl-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .search-input { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 9px; padding: 7px 12px; font-size: 12.3px; color: var(--ink); width: 190px; }
+  .search-input::placeholder { color: var(--ink-muted); }
+  .scope-note { font-size: 11.5px; color: var(--accent-strong); font-weight: 650; background: var(--accent-soft); border-radius: 8px; padding: 6px 10px; display: inline-flex; align-items: center; gap: 6px; width: fit-content; }
+  .scope-note button { border: none; background: none; color: var(--accent-strong); font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; font-size: 11.5px; }
+
+  .content { padding: 20px 26px 60px; display: flex; flex-direction: column; gap: 18px; max-width: 1360px; }
+  .page-view { display: none; }
+  .page-view.active { display: flex; flex-direction: column; gap: 18px; }
+
+  .grid { display: grid; gap: 14px; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-12 { grid-template-columns: repeat(12, 1fr); }
+  .span-8 { grid-column: span 8; } .span-4 { grid-column: span 4; } .span-7 { grid-column: span 7; }
+  .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; }
+  @media (max-width: 1100px) {
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: repeat(2,1fr); }
+    .span-8, .span-4, .span-7, .span-5, .span-6 { grid-column: span 12; }
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .card-title { font-size: 13.5px; font-weight: 700; letter-spacing: -0.005em; }
+  .card-title-sub { font-size: 11.3px; color: var(--ink-muted); margin-top: 2px; font-weight: 500; }
+  .card-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+  .card-link { font-size: 11.5px; color: var(--accent); font-weight: 650; text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 0; }
+  .card-link:hover { text-decoration: underline; }
+  .title-block { display: flex; flex-direction: column; gap: 2px; }
+
+  .hero-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; }
+  @media (max-width: 1100px) { .hero-row { grid-template-columns: 1fr; } }
+  .hero-label { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); }
+  .hero-value-row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .hero-value { font-size: 52px; font-weight: 750; letter-spacing: -0.03em; line-height: 1; }
+  .hero-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; padding: 3px 9px 3px 7px; border-radius: 999px; }
+  .hero-delta.good { color: var(--status-good-text); background: rgba(12,163,12,0.12); }
+  .hero-delta.bad { color: var(--status-critical); background: rgba(208,59,59,0.12); }
+  .hero-formula { font-family: var(--font-mono); font-size: 11.3px; color: var(--ink-muted); }
+  .hero-stat-row { display: flex; gap: 22px; margin-top: 2px; flex-wrap: wrap; }
+  .hero-stat-label { font-size: 10.7px; font-weight: 650; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  .hero-stat-value { font-family: var(--font-mono); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; margin-top: 2px; display: block; }
+  .figure-secondary { font-size: 32px; font-weight: 750; letter-spacing: -0.02em; }
+  .figure-unit { font-size: 13px; color: var(--ink-secondary); font-weight: 650; }
+
+  .kpi-tile { justify-content: space-between; }
+  .kpi-label { font-size: 11.5px; font-weight: 650; color: var(--ink-muted); }
+  .kpi-value-row { display: flex; align-items: baseline; gap: 8px; }
+  .kpi-value { font-family: var(--font-mono); font-size: 24px; font-weight: 600; letter-spacing: -0.01em; }
+  .kpi-delta { font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 2px; }
+  .kpi-delta.up-good { color: var(--status-good-text); }
+  .kpi-delta.down-bad { color: var(--status-critical); }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10.8px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .chip .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .chip-good { color: var(--status-good-text); background: rgba(12,163,12,0.12); } .chip-good .dot { background: var(--status-good); }
+  .chip-warning { color: #8a5b06; background: rgba(250,178,25,0.20); } .chip-warning .dot { background: var(--status-warning); }
+  @media (prefers-color-scheme: dark) { .chip-warning { color: #fab219; } }
+  :root[data-theme="dark"] .chip-warning { color: #fab219; }
+  .chip-serious { color: #9a4a2c; background: rgba(236,131,90,0.18); } .chip-serious .dot { background: var(--status-serious); }
+  .chip-critical { color: var(--status-critical); background: rgba(208,59,59,0.13); } .chip-critical .dot { background: var(--status-critical); }
+  .chip-neutral { color: var(--ink-secondary); background: var(--surface-inset); } .chip-neutral .dot { background: var(--ink-muted); }
+
+  .tier { font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px; letter-spacing: 0.02em; }
+  .tier-1 { background: var(--seq-650); color: #fff; }
+  .tier-2 { background: var(--seq-350); color: #05202f; }
+  .tier-3 { background: var(--seq-100); color: #1c3f63; }
+  @media (prefers-color-scheme: dark) { .tier-2 { color: #fff; } }
+  :root[data-theme="dark"] .tier-2 { color: #fff; }
+
+  .bar-list { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 10px; cursor: default; }
+  .bar-row.clickable { cursor: pointer; border-radius: 8px; padding: 3px 4px; margin: -3px -4px; }
+  .bar-row.clickable:hover { background: var(--surface-inset); }
+  .bar-row.selected { background: var(--accent-soft); border-radius: 8px; padding: 3px 4px; margin: -3px -4px; }
+  .bar-rank { font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); font-weight: 600; }
+  .bar-row.lead .bar-rank { color: var(--accent); }
+  .bar-main { min-width: 0; }
+  .bar-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .bar-label { font-size: 12.3px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-label-meta { font-size: 10.7px; color: var(--ink-muted); font-weight: 550; white-space: nowrap; }
+  .bar-track { height: 8px; border-radius: 4px; background: var(--gridline); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-value { font-family: var(--font-mono); font-size: 12.5px; font-weight: 650; text-align: right; min-width: 44px; }
+  .bar-value-sm { font-size: 11.5px; min-width: 34px; }
+  .bar-row-compact { grid-template-columns: 56px 1fr auto; }
+  .bar-row-compact .bar-track { height: 14px; border-radius: 4px; }
+  .bar-row-compact .bar-fill { border-radius: 4px; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.3px; min-width: 620px; }
+  th { text-align: left; font-size: 10.6px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); padding: 0 10px 8px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+  th.num, td.num { text-align: right; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: var(--ink); }
+  .sort-arrow { font-size: 9px; margin-left: 3px; opacity: 0.75; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--surface-inset); }
+  td.name { font-weight: 650; white-space: normal; }
+  td .sub { display: block; font-size: 10.6px; color: var(--ink-muted); font-weight: 500; }
+  .flash { animation: flashbg 1.6s ease; }
+  @keyframes flashbg { 0% { background: var(--accent-soft); } 100% { background: transparent; } }
+
+  .legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 11.3px; color: var(--ink-secondary); font-weight: 600; }
+  .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+  .legend-swatch.line { width: 14px; height: 3px; border-radius: 2px; }
+
+  .divider { height: 1px; background: var(--border); border: none; margin: 2px 0; }
+  .note { font-size: 11.3px; color: var(--ink-muted); line-height: 1.55; }
+  .note strong { color: var(--ink-secondary); }
+  .banner { display: flex; gap: 10px; align-items: flex-start; padding: 11px 14px; border-radius: 10px; background: var(--accent-soft); border: 1px solid var(--border); }
+  .banner svg { width: 15px; height: 15px; color: var(--accent-strong); flex: none; margin-top: 1px; }
+  .banner-text { font-size: 11.8px; color: var(--ink-secondary); line-height: 1.5; }
+  .banner-text strong { color: var(--ink); }
+
+  .segbtns { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 9px; padding: 2px; gap: 2px; background: var(--surface); }
+  .segbtns button { border: none; background: none; padding: 6px 12px; font-size: 11.8px; font-weight: 650; color: var(--ink-secondary); border-radius: 7px; cursor: pointer; }
+  .segbtns button.active { background: var(--accent); color: var(--accent-ink); }
+
+  .footnote-list { display: flex; flex-direction: column; gap: 8px; }
+  .footnote-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; font-size: 11.5px; color: var(--ink-secondary); line-height: 1.55; }
+  .footnote-item b { color: var(--ink); font-family: var(--font-mono); font-size: 10.5px; }
+
+  .collapse-toggle { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border-strong); background: var(--surface); border-radius: 9px; padding: 7px 12px; font-size: 11.8px; font-weight: 650; color: var(--ink-secondary); cursor: pointer; width: fit-content; }
+  .collapse-toggle:hover { border-color: var(--accent); color: var(--ink); }
+  .collapse-toggle .chev { transition: transform 0.2s ease; }
+  .collapse-toggle.open .chev { transform: rotate(180deg); }
+  .collapse-body { overflow: hidden; max-height: 0; transition: max-height 0.25s ease; }
+  .collapse-body.open { max-height: 700px; }
+
+  ::selection { background: var(--accent-soft); color: var(--accent-strong); }
+  [tabindex]:focus-visible, button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Dashboard pages">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 2v20M3 7l9 5 9-5" stroke="white" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <div><div class="brand-name">Vantage</div><div class="brand-sub">AI Utilization &amp; ROI</div></div>
+    </div>
+
+    <div class="nav-eyebrow">Pages 1–5</div>
+    <div class="nav" role="tablist">
+      <button class="nav-item active" data-page="p1" role="tab" aria-selected="true"><span class="n">1</span> Executive Overview</button>
+      <button class="nav-item" data-page="p2" role="tab" aria-selected="false"><span class="n">2</span> Employee Details</button>
+      <button class="nav-item" data-page="p3" role="tab" aria-selected="false"><span class="n">3</span> Department Deep-Dive</button>
+      <button class="nav-item" data-page="p4" role="tab" aria-selected="false"><span class="n">4</span> App Portfolio</button>
+      <button class="nav-item" data-page="p5" role="tab" aria-selected="false"><span class="n">5</span> ROI &amp; Outcomes Detail</button>
+    </div>
+
+    <div class="rail-foot">
+      <div class="rail-status">
+        <div class="card-eyebrow" style="margin-bottom:2px;">Status key</div>
+        <div class="legend-strip">
+          <div class="legend-strip-row"><span class="legend-dot" style="background:var(--status-good)"></span>Healthy</div>
+          <div class="legend-strip-row"><span class="legend-dot" style="background:var(--status-warning)"></span>Underutilized</div>
+          <div class="legend-strip-row"><span class="legend-dot" style="background:var(--status-serious)"></span>Needs review</div>
+          <div class="legend-strip-row"><span class="legend-dot" style="background:var(--status-critical)"></span>Shadow / unsanctioned</div>
+        </div>
+      </div>
+      <div class="rail-status">
+        <div class="rail-status-row"><span>Data coverage</span><strong style="font-family:var(--font-mono)">64%</strong></div>
+        <div class="coverage-track"><div class="coverage-fill" style="width:64%"></div></div>
+        <div style="color:var(--ink-muted); font-size:10.3px;">measured vs. survey-estimated · see Page 5</div>
+      </div>
+      <div class="rail-status" style="gap:4px;">
+        <div class="rail-status-row"><span>Fiscal period</span><strong>FY26 · Trailing 12mo</strong></div>
+        <div class="rail-status-row"><span>Org scope</span><strong>2,000 · 15 depts</strong></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-head">
+        <div>
+          <div class="page-title" id="pageTitle">Executive Overview</div>
+          <div class="page-sub" id="pageSub">Company-wide AI investment, adoption, usage, and return — trailing 12 months</div>
+        </div>
+        <span class="wf-badge">Interactive prototype · hypothetical data</span>
+      </div>
+      <div class="filters">
+        <select class="ctrl-select" id="deptFilter" aria-label="Filter by department" title="Filters Page 1 to a single department"></select>
+        <button class="filter-chip" id="segChip-seniority" data-dim="seniority">Seniority: All</button>
+        <button class="filter-chip" id="segChip-tenure" data-dim="tenure">Tenure: All</button>
+        <button class="filter-chip" id="segChip-location" data-dim="location">Location: All</button>
+        <button class="filter-chip" id="segChip-employment" data-dim="employment">Employment: All</button>
+        <div class="filter-divider"></div>
+        <button class="filter-chip" id="segChip-age" data-dim="age">Age band: All</button>
+        <button class="filter-chip" id="segChip-gender" data-dim="gender">Gender: All</button>
+        <span class="wf-badge" style="border-style:solid; opacity:0.75;">age/gender aggregate-only, n≥5</span>
+        <div class="filter-divider"></div>
+        <button class="filter-reset" id="resetFilters">Reset filters</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- PAGE 1 -->
+      <section class="page-view active" id="p1">
+        <div id="p1-scope"></div>
+        <div class="hero-row">
+          <div class="card hero-card" id="p1-hero-left"></div>
+          <div class="card" id="p1-hero-right"></div>
+        </div>
+        <div class="grid grid-4" id="p1-kpi-row"></div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div><div class="card-title">Top performing departments</div><div class="card-title-sub" id="p1-dept-sub">By ROI %</div></div>
+              <a class="card-link" href="#" data-goto="p3">Department detail →</a>
+            </div>
+            <div class="bar-list" id="p1-dept-list"></div>
+            <button class="collapse-toggle" id="p1-dept-toggle">Show all 15 departments <span class="chev">▾</span></button>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div><div class="card-title">Top performing applications</div><div class="card-title-sub">By ROI %, of 300 AI-capable apps</div></div>
+              <a class="card-link" href="#" data-goto="p4">Portfolio detail →</a>
+            </div>
+            <div class="bar-list" id="p1-app-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 2 -->
+      <section class="page-view" id="p2">
+        <div class="banner">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <div class="banner-text"><strong>Governance rule applied to this page.</strong> Age band and gender are shown in aggregate only. Any cell with fewer than 5 employees is suppressed (shown as "—"). These cuts are for adoption-equity analysis only — never for individual performance review. Selecting a filter chip in the top bar sets the active segment below; only one dimension applies at a time.</div>
+        </div>
+        <div class="grid grid-4" id="p2-kpi-row"></div>
+        <div class="card-head" style="align-items:center;">
+          <div class="card-title" style="font-size:12.5px; color:var(--ink-secondary); font-weight:650;">View segment cards by:</div>
+          <div class="segbtns" id="p2-view-toggle">
+            <button class="active" data-view="adoption">Adoption %</button>
+            <button data-view="roi">ROI %</button>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="title-block"><div class="card-title">By seniority</div></div><div class="bar-list" id="p2-seg-seniority"></div><div class="note">Managers lean on AI for synthesis/reporting; ICs for execution-level tasks.</div></div>
+          <div class="card"><div class="title-block"><div class="card-title">By tenure</div><div class="card-title-sub">Ordinal — darker = longer tenure</div></div><div class="bar-list" id="p2-seg-tenure"></div></div>
+        </div>
+        <div class="grid grid-4">
+          <div class="card"><div class="title-block"><div class="card-title">By age band</div><div class="card-title-sub">Governance-gated · ordinal</div></div><div class="bar-list" id="p2-seg-age"></div><div class="note">*n=38; suppressed at dept level in 2 of 15 depts.</div></div>
+          <div class="card"><div class="title-block"><div class="card-title">By gender</div><div class="card-title-sub">Governance-gated · categorical</div></div><div class="bar-list" id="p2-seg-gender"></div><div class="note">Other/undisclosed suppressed — n&lt;5 in 9 of 15 depts.</div></div>
+          <div class="card"><div class="card-title">By location</div><div class="bar-list" id="p2-seg-location"></div></div>
+          <div class="card"><div class="card-title">By employment type</div><div class="bar-list" id="p2-seg-employment"></div><div class="note">Lower contractor adoption tracks fewer standing licenses, not lower engagement.</div></div>
+        </div>
+        <div class="grid grid-12">
+          <div class="card span-7">
+            <div class="card-head">
+              <div><div class="card-title">Employee segment table</div><div class="card-title-sub">Click a row to open that department on Page 3</div></div>
+              <input class="search-input" id="p2-search" type="search" placeholder="Search department…">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th class="sortable" data-key="dept">Department · Seniority · Tenure</th>
+                  <th class="num sortable" data-key="adoption">Adoption</th>
+                  <th class="num sortable" data-key="prompts">Prompts / mo</th>
+                  <th class="num sortable" data-key="hrs">Hrs saved / mo</th>
+                  <th class="num sortable" data-key="roi">ROI</th>
+                </tr></thead>
+                <tbody id="p2-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card span-5">
+            <div class="title-block"><div class="card-title">Time-to-first-use (activation lag)</div><div class="card-title-sub">Days between provisioning and first use</div></div>
+            <div class="bar-list">
+              <div class="bar-row bar-row-compact"><span class="bar-label">0–1d</span><div class="bar-track"><div class="bar-fill" style="width:22%; background:var(--seq-450);"></div></div><span class="bar-value bar-value-sm">22%</span></div>
+              <div class="bar-row bar-row-compact"><span class="bar-label">2–7d</span><div class="bar-track"><div class="bar-fill" style="width:38%; background:var(--seq-450);"></div></div><span class="bar-value bar-value-sm">38%</span></div>
+              <div class="bar-row bar-row-compact"><span class="bar-label">8–30d</span><div class="bar-track"><div class="bar-fill" style="width:27%; background:var(--seq-450);"></div></div><span class="bar-value bar-value-sm">27%</span></div>
+              <div class="bar-row bar-row-compact"><span class="bar-label">31–90d</span><div class="bar-track"><div class="bar-fill" style="width:9%; background:var(--seq-450);"></div></div><span class="bar-value bar-value-sm">9%</span></div>
+              <div class="bar-row bar-row-compact"><span class="bar-label">90d+</span><div class="bar-track"><div class="bar-fill" style="width:4%; background:var(--seq-450);"></div></div><span class="bar-value bar-value-sm">4%</span></div>
+            </div>
+            <div class="note">60% of employees reach first use within a week of provisioning — the remaining tail is the onboarding-friction target.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3 -->
+      <section class="page-view" id="p3">
+        <div class="card" style="flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <select class="ctrl-select" id="p3-dept-select" aria-label="Select department"></select>
+            <span class="chip chip-good" id="p3-rank-chip"><span class="dot"></span></span>
+          </div>
+          <div class="segbtns"><button class="active">6 months</button><button>12 months</button><button>All time</button></div>
+        </div>
+        <div class="grid grid-4" id="p3-kpi-row"></div>
+        <div class="card">
+          <div class="card-title">Adoption trend, trailing 6 months</div>
+          <svg viewBox="0 0 960 150" width="100%" style="height:auto; display:block; max-height:190px;" role="img" id="p3-trend-svg" aria-label="Adoption trend line chart"></svg>
+        </div>
+        <button class="collapse-toggle" id="p3-funnel-toggle">Show funnel breakdown (why is ROI at this level?) <span class="chev">▾</span></button>
+        <div class="collapse-body" id="p3-funnel-body">
+          <div class="card" style="margin-top:2px;">
+            <div class="card-title">Funnel — selected department vs. company average</div>
+            <div class="card-title-sub" style="margin-top:-8px;">Diagnostic view: shows which stage is the actual bottleneck</div>
+            <div class="bar-list" id="p3-funnel-bars" style="margin-top:8px;"></div>
+            <div class="legend"><span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>Selected department</span><span class="legend-item"><span class="legend-swatch" style="background:var(--ink-muted); opacity:0.5;"></span>Company average</span></div>
+          </div>
+        </div>
+        <div class="grid grid-12">
+          <div class="card span-8">
+            <div class="card-head"><div class="card-title" id="p3-outcomes-title">Outcome KPIs</div><div class="chip chip-neutral">true outcomes only</div></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Metric</th><th class="num">Current</th><th class="num">Prior period</th><th class="num">Δ</th><th>Timing</th></tr></thead>
+              <tbody id="p3-outcomes-body"></tbody>
+            </table></div>
+          </div>
+          <div class="card span-4">
+            <div class="card-title">App usage within department</div>
+            <div class="bar-list" id="p3-apps-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 4 -->
+      <section class="page-view" id="p4">
+        <div class="grid grid-3">
+          <div class="card kpi-tile"><div class="kpi-label">Total AI-capable apps</div><div class="kpi-value-row"><span class="kpi-value">300</span></div><div class="note">of 800 apps company-wide</div></div>
+          <div class="card kpi-tile"><div class="kpi-label">Shelf-ware</div><div class="kpi-value-row"><span class="kpi-value">34</span><span class="kpi-delta down-bad">11% of licensed</span></div></div>
+          <div class="card kpi-tile"><div class="kpi-label">License + infra cost</div><div class="kpi-value-row"><span class="kpi-value">$3.08M</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Adoption vs. ROI, sized by cost</div><div class="card-title-sub">Color = tier (ordinal). Hover a point for detail; click to jump to its table row.</div></div>
+            <div class="legend"><span class="legend-item"><span class="legend-swatch" style="background:var(--seq-650); border-radius:50%;"></span>Tier 1</span><span class="legend-item"><span class="legend-swatch" style="background:var(--seq-350); border-radius:50%;"></span>Tier 2</span><span class="legend-item"><span class="legend-swatch" style="background:var(--seq-150); border-radius:50%;"></span>Tier 3</span></div>
+          </div>
+          <svg viewBox="0 0 640 260" width="100%" height="260" role="img" id="p4-scatter-svg" aria-label="Scatter of adoption vs ROI by application"></svg>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Application register</div><div class="card-title-sub">10 of 300 — click headers to sort</div></div>
+            <input class="search-input" id="p4-search" type="search" placeholder="Search application…">
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th class="sortable" data-key="name">Application</th><th>Tier</th>
+              <th class="num sortable" data-key="license">License cost</th>
+              <th class="num sortable" data-key="adoption">Adoption</th>
+              <th class="num sortable" data-key="prompts">Prompts/mo</th>
+              <th class="num sortable" data-key="hours">Hrs saved/yr</th>
+              <th class="num sortable" data-key="roi">ROI</th><th>Status</th>
+            </tr></thead>
+            <tbody id="p4-table-body"></tbody>
+          </table></div>
+          <div class="note">*Shadow AI usage is self-reported/estimated, not system-logged — flagged for security review, not included in ROI calculation until instrumented.</div>
+        </div>
+      </section>
+
+      <!-- PAGE 5 -->
+      <section class="page-view" id="p5">
+        <div class="card" style="flex-direction:row; align-items:center; gap:24px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; color:var(--ink-secondary);">
+          <span><strong style="color:var(--ink);">Net Value</strong> = Gross Value − Total Cost</span>
+          <span style="color:var(--ink-muted);">·</span>
+          <span><strong style="color:var(--ink);">ROI %</strong> = Net Value / Total Cost × 100</span>
+          <span style="color:var(--ink-muted);">·</span>
+          <span><strong style="color:var(--ink);">Payback</strong> = Amortized setup cost / Net Value per month</span>
+        </div>
+        <div class="grid grid-12">
+          <div class="card span-8">
+            <div class="card-title">Cost breakdown (TCO, annualized)</div>
+            <div class="bar-list">
+              <div class="bar-row" style="grid-template-columns:100px 1fr auto;" title="$2.40M — 58% of TCO"><span class="bar-label">License</span><div class="bar-track" style="height:14px;"><div class="bar-fill" style="width:100%; background:var(--cat-1);"></div></div><span class="bar-value">$2.40M</span></div>
+              <div class="bar-row" style="grid-template-columns:100px 1fr auto;" title="$0.68M — 17% of TCO"><span class="bar-label">Token/infra</span><div class="bar-track" style="height:14px;"><div class="bar-fill" style="width:28%; background:var(--cat-2);"></div></div><span class="bar-value">$0.68M</span></div>
+              <div class="bar-row" style="grid-template-columns:100px 1fr auto;" title="$0.41M — 10% of TCO"><span class="bar-label">Setup</span><div class="bar-track" style="height:14px;"><div class="bar-fill" style="width:17%; background:var(--cat-3);"></div></div><span class="bar-value">$0.41M</span></div>
+              <div class="bar-row" style="grid-template-columns:100px 1fr auto;" title="$0.26M — 6% of TCO"><span class="bar-label">Training</span><div class="bar-track" style="height:14px;"><div class="bar-fill" style="width:11%; background:var(--cat-4);"></div></div><span class="bar-value">$0.26M</span></div>
+              <div class="bar-row" style="grid-template-columns:100px 1fr auto;" title="$0.19M — 5% of TCO"><span class="bar-label">Support</span><div class="bar-track" style="height:14px;"><div class="bar-fill" style="width:8%; background:var(--cat-5);"></div></div><span class="bar-value">$0.19M</span></div>
+              <div class="bar-row" style="grid-template-columns:100px 1fr auto;" title="$0.14M — 3% of TCO"><span class="bar-label">Risk/rework</span><div class="bar-track" style="height:14px;"><div class="bar-fill" style="width:6%; background:var(--cat-8);"></div></div><span class="bar-value">$0.14M</span></div>
+            </div>
+            <div class="note">Setup cost amortized over a 24-month useful-life window, not expensed in period 1.</div>
+          </div>
+          <div class="card span-4">
+            <div class="card-eyebrow">Payback period</div>
+            <div class="hero-value-row"><span class="figure-secondary">4.2</span><span class="figure-unit">months</span></div>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+              <svg width="140" height="8" viewBox="0 0 140 8"><line x1="0" y1="4" x2="140" y2="4" stroke="var(--gridline)" stroke-width="4" stroke-linecap="round"/><line x1="0" y1="4" x2="59" y2="4" stroke="var(--accent)" stroke-width="4" stroke-linecap="round"/><circle cx="59" cy="4" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/></svg>
+            </div>
+            <div class="note">Time to recoup total investment ($4.08M) from net value run-rate ($1.6M/yr).</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">Counterfactual check — high vs. low AI-adoption cohorts</div><div class="card-title-sub">Matched on function &amp; headcount, staggered rollout design. Hover the line ends for exact index values.</div></div></div>
+          <svg viewBox="0 0 960 170" width="100%" style="height:auto; display:block; max-height:200px;" role="img" id="p5-counterfactual-svg" aria-label="Line chart comparing high and low adoption cohorts over time"></svg>
+          <div class="legend"><span class="legend-item"><span class="legend-swatch line" style="background:var(--cat-1)"></span>High-adoption cohort</span><span class="legend-item"><span class="legend-swatch line" style="background:var(--ink-muted)"></span>Matched control cohort</span></div>
+          <div class="note">Output-per-employee index, both cohorts = 100 at baseline. The gap between lines is the portion of outcome lift attributable to AI, isolated from the general productivity trend.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Methodology &amp; assumptions</div>
+          <div class="footnote-list">
+            <div class="footnote-item"><b>01</b><span><strong style="color:var(--ink);">Loaded hourly rate</strong> — $68/hr blended (salary + benefits + overhead), varies by department/level in the underlying model; not a flat company-wide rate.</span></div>
+            <div class="footnote-item"><b>02</b><span><strong style="color:var(--ink);">Hours-saved calibration</strong> — anchored to a task-time benchmark (n=140 sampled tasks) plus a standardized self-report instrument; not inferred from prompt/token volume alone.</span></div>
+            <div class="footnote-item"><b>03</b><span><strong style="color:var(--ink);">Causal attribution</strong> — staggered-rollout design; high-adoption cohorts matched to controls on function and headcount, not raw correlation (see counterfactual chart above).</span></div>
+            <div class="footnote-item"><b>04</b><span><strong style="color:var(--ink);">Setup cost amortization</strong> — straight-line over a 24-month useful-life window.</span></div>
+            <div class="footnote-item"><b>05</b><span><strong style="color:var(--ink);">Double-count reconciliation</strong> — cost-avoidance and outcome-lift value are cross-checked against the same underlying activity; overlap is removed once, not estimated twice.</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== DATA ===================== */
+const COMPANY = { roi:39, netValueM:1.6, costM:4.08, valueGeneratedM:5.70, hoursSaved:86300, availability:93, adoption:62, mau:1240, efficiency:5.8, payback:4.2, eligible:2000 };
+
+const DEPARTMENTS = [
+ {id:"engineering", name:"Engineering", eligible:420, availability:97, adoption:81, utilization:58, efficiency:7.6, roi:71, costK:780, netK:560, hours:31000, enps:42,
+  outcomes:[["Deployment frequency","4.2 / wk","3.1 / wk","+35%","leading"],["Change failure rate","6.8%","9.1%","−2.3pt","leading"],["Issue resolution time","1.8 days","2.6 days","−31%","leading"],["Deadlines met","88%","81%","+7pt","lagging"]],
+  apps:[["GitHub Copilot",94],["Gemini Workspace",61],["Internal LLM sandbox",40]]},
+ {id:"data-analytics", name:"Data & Analytics", eligible:140, availability:95, adoption:75, utilization:46, efficiency:6.8, roi:64, costK:260, netK:166, hours:8570, enps:35,
+  outcomes:[["Report turnaround time","1.2 days","2.0 days","−40%","leading"],["Model/pipeline error rate","4.1%","6.5%","−2.4pt","leading"],["Ad-hoc requests closed same-day","61%","44%","+17pt","leading"],["Stakeholder satisfaction","82%","74%","+8pt","lagging"]],
+  apps:[["Internal LLM sandbox",58],["Gemini Workspace",49],["GitHub Copilot",22]]},
+ {id:"customer-support", name:"Customer Support", eligible:210, availability:94, adoption:70, utilization:51, efficiency:7.1, roi:58, costK:390, netK:226, hours:12500, enps:30,
+  outcomes:[["Ticket resolution time","3.4 hrs","5.1 hrs","−33%","leading"],["First-response time","0.6 hrs","1.4 hrs","−57%","leading"],["CSAT","91%","85%","+6pt","lagging"],["Open ticket backlog","210","340","−38%","leading"]],
+  apps:[["Zendesk AI",84],["Otter.ai",39],["Gemini Workspace",28]]},
+ {id:"sales", name:"Sales", eligible:260, availability:91, adoption:63, utilization:39, efficiency:5.4, roi:46, costK:480, netK:221, hours:10600, enps:18,
+  outcomes:[["Deals closed / mo","38","31","+23%","lagging"],["Sales cycle length","34 days","41 days","−17%","leading"],["Win rate","29%","24%","+5pt","lagging"],["Quota attainment","94%","86%","+8pt","lagging"]],
+  apps:[["Gemini Workspace",55],["Otter.ai",47],["Grammarly Business AI",31]]},
+ {id:"marketing", name:"Marketing", eligible:95, availability:90, adoption:60, utilization:37, efficiency:5.0, roi:41, costK:175, netK:72, hours:3400, enps:15,
+  outcomes:[["Campaign turnaround time","4.1 days","6.8 days","−40%","leading"],["Content rework rate","12%","22%","−10pt","leading"],["On-time campaign launch rate","88%","71%","+17pt","leading"],["MQL-to-SQL conversion","19%","15%","+4pt","lagging"]],
+  apps:[["Grammarly Business AI",61],["Adobe Firefly",34],["Jasper",29]]},
+ {id:"product", name:"Product", eligible:90, availability:92, adoption:59, utilization:35, efficiency:5.2, roi:38, costK:165, netK:63, hours:3300, enps:20,
+  outcomes:[["Spec-to-ship cycle time","11 days","16 days","−31%","leading"],["Rework rate","9%","15%","−6pt","leading"],["On-time roadmap delivery","76%","64%","+12pt","lagging"],["Backlog age (median)","22 days","31 days","−29%","leading"]],
+  apps:[["Gemini Workspace",58],["Notion AI",44],["GitHub Copilot",19]]},
+ {id:"it-security", name:"IT/Security", eligible:110, availability:96, adoption:55, utilization:33, efficiency:4.9, roi:37, costK:205, netK:76, hours:3550, enps:12,
+  outcomes:[["Incident response time","0.8 hrs","1.6 hrs","−50%","leading"],["Patch/change error rate","2.9%","5.2%","−2.3pt","leading"],["SLA compliance","96%","89%","+7pt","lagging"],["Security review backlog","14 items","26 items","−46%","leading"]],
+  apps:[["Internal LLM sandbox",51],["Gemini Workspace",33],["Otter.ai",18]]},
+ {id:"customer-success", name:"Customer Success", eligible:130, availability:89, adoption:57, utilization:34, efficiency:5.1, roi:35, costK:240, netK:84, hours:4500, enps:22,
+  outcomes:[["Onboarding cycle time","6.2 days","9.4 days","−34%","leading"],["Renewal-risk cases resolved","68%","51%","+17pt","leading"],["NRR-linked CSAT","87%","80%","+7pt","lagging"],["Case backlog","58","91","−36%","leading"]],
+  apps:[["Zendesk AI",62],["Otter.ai",45],["Gemini Workspace",30]]},
+ {id:"operations", name:"Operations", eligible:150, availability:88, adoption:50, utilization:28, efficiency:4.2, roi:30, costK:280, netK:84, hours:3800, enps:8,
+  outcomes:[["Process cycle time","2.1 days","3.4 days","−38%","leading"],["Error/exception rate","3.6%","6.0%","−2.4pt","leading"],["SLA compliance","90%","81%","+9pt","lagging"],["Open request backlog","44","72","−39%","leading"]],
+  apps:[["Gemini Workspace",40],["Notion AI",33],["Otter.ai",21]]},
+ {id:"design", name:"Design", eligible:60, availability:90, adoption:52, utilization:30, efficiency:4.4, roi:28, costK:110, netK:31, hours:1650, enps:14,
+  outcomes:[["Design-to-handoff cycle time","5.4 days","8.1 days","−33%","leading"],["Revision rounds per project","2.1","3.4","−38%","leading"],["On-time delivery rate","79%","66%","+13pt","lagging"],["Component reuse rate","41%","28%","+13pt","leading"]],
+  apps:[["Adobe Firefly",57],["Gemini Workspace",29],["Notion AI",18]]},
+ {id:"biz-dev", name:"Business Development", eligible:75, availability:87, adoption:48, utilization:26, efficiency:3.9, roi:26, costK:140, netK:36, hours:1700, enps:6,
+  outcomes:[["Partner deals sourced / mo","6","4","+50%","lagging"],["Deal cycle length","52 days","63 days","−17%","leading"],["Proposal win rate","22%","17%","+5pt","lagging"],["Pipeline coverage","3.1x","2.4x","+0.7x","leading"]],
+  apps:[["Gemini Workspace",46],["Otter.ai",38],["Grammarly Business AI",24]]},
+ {id:"finance", name:"Finance", eligible:85, availability:93, adoption:45, utilization:22, efficiency:3.4, roi:24, costK:155, netK:37, hours:1560, enps:5,
+  outcomes:[["Close cycle time","4.8 days","6.9 days","−30%","leading"],["Reporting error rate","1.8%","3.6%","−1.8pt","leading"],["Forecast accuracy","91%","84%","+7pt","lagging"],["Manual reconciliation hrs / mo","62","108","−43%","leading"]],
+  apps:[["Gemini Workspace",35],["Notion AI",21],["Otter.ai",14]]},
+ {id:"hr-people", name:"HR / People", eligible:70, availability:90, adoption:44, utilization:19, efficiency:3.1, roi:21, costK:130, netK:27, hours:1150, enps:3,
+  outcomes:[["Time-to-hire","28 days","39 days","−28%","leading"],["Screening error/mismatch rate","6%","11%","−5pt","leading"],["Offer acceptance rate","84%","76%","+8pt","lagging"],["Onboarding satisfaction","79%","70%","+9pt","lagging"]],
+  apps:[["Gemini Workspace",38],["Notion AI",26],["Otter.ai",19]]},
+ {id:"legal", name:"Legal", eligible:35, availability:85, adoption:38, utilization:16, efficiency:2.6, roi:17, costK:65, netK:11, hours:415, enps:-2,
+  outcomes:[["Contract review cycle time","2.6 days","4.4 days","−41%","leading"],["Redline error rate","3.1%","5.8%","−2.7pt","leading"],["SLA compliance","88%","79%","+9pt","lagging"],["Contract backlog","19","33","−42%","leading"]],
+  apps:[["Gemini Workspace",29],["Notion AI",17],["Otter.ai",11]]},
+ {id:"exec-admin", name:"Executive / Admin", eligible:70, availability:82, adoption:33, utilization:14, efficiency:2.2, roi:14, costK:130, netK:18, hours:610, enps:-5,
+  outcomes:[["Scheduling/coordination turnaround","0.4 days","0.9 days","−56%","leading"],["Report/briefing prep time","2.1 hrs","3.8 hrs","−45%","leading"],["Meeting prep satisfaction","74%","68%","+6pt","lagging"],["Admin request backlog","9","17","−47%","leading"]],
+  apps:[["Gemini Workspace",31],["Otter.ai",22],["Notion AI",14]]}
+];
+DEPARTMENTS.sort((a,b)=>b.roi-a.roi);
+DEPARTMENTS.forEach((d,i)=>d.rank=i+1);
+
+const APPS = [
+ {name:"GitHub Copilot", tier:1, dept:"Engineering", license:420, adoption:79, prompts:210, roi:88, hours:28400, status:"good", statusLabel:"Healthy"},
+ {name:"Gemini Workspace", tier:1, dept:"Company-wide", license:560, adoption:58, prompts:34, roi:62, hours:21600, status:"good", statusLabel:"Healthy"},
+ {name:"Zendesk AI", tier:2, dept:"Customer Support", license:180, adoption:71, prompts:48, roi:55, hours:9800, status:"good", statusLabel:"Healthy"},
+ {name:"Internal LLM sandbox", tier:2, dept:"Eng / Data / IT", license:140, adoption:34, prompts:26, roi:41, hours:5200, status:"good", statusLabel:"Healthy"},
+ {name:"Otter.ai", tier:2, dept:"Company-wide", license:95, adoption:44, prompts:12, roi:47, hours:4200, status:"good", statusLabel:"Healthy"},
+ {name:"Grammarly Business AI", tier:2, dept:"Company-wide", license:64, adoption:55, prompts:22, roi:44, hours:3100, status:"good", statusLabel:"Healthy"},
+ {name:"Notion AI", tier:2, dept:"Company-wide", license:120, adoption:39, prompts:18, roi:38, hours:2400, status:"warning", statusLabel:"Underutilized"},
+ {name:"Jasper", tier:2, dept:"Marketing", license:88, adoption:21, prompts:9, roi:12, hours:900, status:"warning", statusLabel:"Underutilized"},
+ {name:"Adobe Firefly", tier:2, dept:"Design / Marketing", license:52, adoption:14, prompts:4, roi:-8, hours:480, status:"serious", statusLabel:"Shelf-ware risk"},
+ {name:"ChatGPT Free (unsanctioned)", tier:3, dept:"Multiple, self-reported", license:0, adoption:18, prompts:null, roi:null, hours:null, status:"critical", statusLabel:"Shadow AI"}
+];
+
+const SEGMENTS = {
+ seniority:[{key:"manager",label:"Manager",adoption:74,roi:48},{key:"ic",label:"IC",adoption:58,roi:34}],
+ tenure:[{key:"lt1",label:"<1yr",adoption:71,roi:37},{key:"1-3",label:"1–3yr",adoption:66,roi:41},{key:"3-5",label:"3–5yr",adoption:58,roi:44},{key:"5plus",label:"5yr+",adoption:49,roi:39}],
+ age:[{key:"20-29",label:"20–29",adoption:74,roi:36},{key:"30-39",label:"30–39",adoption:65,roi:42},{key:"40-49",label:"40–49",adoption:54,roi:41},{key:"50plus",label:"50+",adoption:41,roi:33,note:"n=38"}],
+ gender:[{key:"women",label:"Women",adoption:60,roi:39},{key:"men",label:"Men",adoption:64,roi:40},{key:"other",label:"Other",adoption:null,roi:null,note:"suppressed"}],
+ location:[{key:"office",label:"Office",adoption:68,roi:43},{key:"remote",label:"Remote",adoption:57,roi:35}],
+ employment:[{key:"fte",label:"FTE",adoption:63,roi:41},{key:"contractor",label:"Contractor",adoption:41,roi:22}]
+};
+const SEG_LABELS = {seniority:"Seniority",tenure:"Tenure",age:"Age band",gender:"Gender",location:"Location",employment:"Employment"};
+const SEG_COLOR_MODE = {seniority:"cat", tenure:"seq", age:"seq", gender:"cat", location:"cat", employment:"cat"};
+
+const SEGMENT_TABLE = [
+ {dept:"Engineering", seniority:"IC", tenure:"1–3yr", adoption:68, prompts:54, hrs:7.1, roi:64},
+ {dept:"Engineering", seniority:"Manager", tenure:"5yr+", adoption:79, prompts:38, hrs:6.4, roi:77},
+ {dept:"Sales", seniority:"IC", tenure:"<1yr", adoption:61, prompts:47, hrs:5.2, roi:38},
+ {dept:"Sales", seniority:"Manager", tenure:"3–5yr", adoption:70, prompts:31, hrs:4.8, roi:51},
+ {dept:"Customer Support", seniority:"IC", tenure:"1–3yr", adoption:66, prompts:61, hrs:8.3, roi:55},
+ {dept:"Marketing", seniority:"IC", tenure:"<1yr", adoption:59, prompts:44, hrs:4.6, roi:33},
+ {dept:"HR / People", seniority:"Manager", tenure:"5yr+", adoption:52, prompts:19, hrs:3.1, roi:21},
+ {dept:"Finance", seniority:"IC", tenure:"3–5yr", adoption:45, prompts:22, hrs:3.4, roi:24}
+];
+
+/* ===================== STATE ===================== */
+const state = {
+  page: "p1",
+  p1Dept: "all",
+  p1ShowAll: false,
+  p3Dept: "engineering",
+  p3FunnelOpen: false,
+  segDim: null, segKey: null,
+  p2View: "adoption",
+  p2Sort: {key:"roi", dir:"desc"},
+  p2Search: "",
+  p4Sort: {key:"roi", dir:"desc"},
+  p4Search: ""
+};
+
+/* ===================== UTIL ===================== */
+function fmtM(n){ return "$" + n.toFixed(2) + "M"; }
+function fmtK(n){ return "$" + Math.round(n) + "K"; }
+function fmtNum(n){ return n.toLocaleString(); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function deptById(id){ return DEPARTMENTS.find(d=>d.id===id); }
+function catColor(i){ return ["var(--cat-1)","var(--cat-2)","var(--cat-3)","var(--cat-4)","var(--cat-5)","var(--cat-6)","var(--cat-7)","var(--cat-8)"][i%8]; }
+function seqColor(i,n){ const steps=["var(--seq-250)","var(--seq-350)","var(--seq-450)","var(--seq-550)","var(--seq-650)"]; return steps[Math.min(i,steps.length-1)]; }
+function funnelFor(d){ return [d.availability, d.adoption, Math.round(d.adoption*0.82), Math.round(d.adoption*0.72), Math.round(d.adoption*0.54)]; }
+const COMPANY_FUNNEL = [93,62,45,36,24];
+
+/* ===================== NAV ===================== */
+const TITLES = {
+  p1:["Executive Overview","Company-wide AI investment, adoption, usage, and return — trailing 12 months"],
+  p2:["Employee Details","Adoption and ROI by segment — governance-gated on age and gender"],
+  p3:["Department Deep-Dive","Outcomes, trend, and cost/ROI for a selected department"],
+  p4:["Application Portfolio","Cost, adoption, and ROI across the 300-app AI estate"],
+  p5:["ROI & Business Outcomes Detail","Cost breakdown, payback, counterfactual check, and methodology"]
+};
+function showPage(id){
+  state.page = id;
+  document.querySelectorAll(".page-view").forEach(p=>p.classList.toggle("active", p.id===id));
+  document.querySelectorAll(".nav-item").forEach(n=>{
+    const on = n.dataset.page===id;
+    n.classList.toggle("active", on);
+    n.setAttribute("aria-selected", on?"true":"false");
+  });
+  document.getElementById("pageTitle").textContent = TITLES[id][0];
+  document.getElementById("pageSub").textContent = TITLES[id][1];
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".nav-item").forEach(n=>n.addEventListener("click",()=>showPage(n.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(el=>el.addEventListener("click",e=>{e.preventDefault(); showPage(el.dataset.goto);}));
+
+/* ===================== TOP FILTER BAR ===================== */
+const deptSelect = document.getElementById("deptFilter");
+deptSelect.innerHTML = '<option value="all">All departments</option>' + DEPARTMENTS.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join("");
+deptSelect.addEventListener("change", ()=>{ state.p1Dept = deptSelect.value; renderP1(); });
+
+["seniority","tenure","age","gender","location","employment"].forEach(dim=>{
+  document.getElementById("segChip-"+dim).addEventListener("click", ()=>{
+    if(state.segDim===dim){ state.segDim=null; state.segKey=null; }
+    else {
+      state.segDim = dim; state.segKey = SEGMENTS[dim][0].key;
+    }
+    syncFilterChips(); renderP2();
+  });
+});
+document.getElementById("resetFilters").addEventListener("click", ()=>{
+  state.p1Dept="all"; deptSelect.value="all"; state.segDim=null; state.segKey=null;
+  syncFilterChips(); renderP1(); renderP2();
+});
+function cycleSegValue(dim){
+  const opts = SEGMENTS[dim];
+  const idx = opts.findIndex(o=>o.key===state.segKey);
+  const next = (idx+1) % opts.length;
+  state.segKey = opts[next].key;
+}
+// clicking chip again while active cycles its value instead of clearing; double-click behavior handled via a second click target
+document.querySelectorAll(".filter-chip[data-dim]").forEach(chip=>{
+  chip.addEventListener("click", (e)=>{
+    const dim = chip.dataset.dim;
+    if(state.segDim===dim){ cycleSegValue(dim); }
+    else { state.segDim=dim; state.segKey=SEGMENTS[dim][0].key; }
+    syncFilterChips(); renderP2();
+  });
+});
+function syncFilterChips(){
+  ["seniority","tenure","age","gender","location","employment"].forEach(dim=>{
+    const chip = document.getElementById("segChip-"+dim);
+    const active = state.segDim===dim;
+    chip.classList.toggle("on", active);
+    if(active){
+      const opt = SEGMENTS[dim].find(o=>o.key===state.segKey);
+      chip.textContent = SEG_LABELS[dim]+": "+opt.label+" (click to cycle)";
+    } else {
+      chip.textContent = SEG_LABELS[dim]+": All";
+    }
+  });
+}
+syncFilterChips();
+
+/* ===================== PAGE 1 ===================== */
+function p1Scope(){
+  const el = document.getElementById("p1-scope");
+  if(state.p1Dept==="all"){ el.innerHTML=""; return; }
+  const d = deptById(state.p1Dept);
+  el.innerHTML = `<div class="scope-note">Showing: ${esc(d.name)} only <button id="p1-scope-clear">· clear</button></div>`;
+  document.getElementById("p1-scope-clear").addEventListener("click", ()=>{ state.p1Dept="all"; deptSelect.value="all"; renderP1(); });
+}
+function renderP1(){
+  p1Scope();
+  const isAll = state.p1Dept==="all";
+  const d = isAll ? null : deptById(state.p1Dept);
+  const roi = isAll ? COMPANY.roi : d.roi;
+  const valueM = isAll ? COMPANY.valueGeneratedM : (d.netK+d.costK)/1000;
+  const costM = isAll ? COMPANY.costM : d.costK/1000;
+  const hours = isAll ? COMPANY.hoursSaved : d.hours;
+  const netM = isAll ? COMPANY.netValueM : d.netK/1000;
+  const payback = isAll ? COMPANY.payback : ((d.costK*0.10) / (d.netK/12)).toFixed(1);
+  const availability = isAll ? COMPANY.availability : d.availability;
+  const adoption = isAll ? COMPANY.adoption : d.adoption;
+  const efficiency = isAll ? COMPANY.efficiency : d.efficiency;
+  const belowTarget = DEPARTMENTS.filter(x=>x.roi<COMPANY.roi).length;
+
+  document.getElementById("p1-hero-left").innerHTML = `
+    <div class="hero-label">Return on AI investment · ROI % ${isAll?"":"— "+esc(d.name)}</div>
+    <div class="hero-value-row"><span class="hero-value">${roi}%</span>
+      <span class="hero-delta ${roi>=COMPANY.roi?'good':'bad'}">${roi>=COMPANY.roi?'▲':'▼'} ${roi>=COMPANY.roi?'above':'below'} co. avg ${COMPANY.roi}%</span>
+    </div>
+    <div class="hero-formula">ROI = (Value Generated − Total Cost) / Total Cost × 100 = (${fmtM(valueM)} − ${fmtM(costM)}) / ${fmtM(costM)}</div>
+    <hr class="divider"/>
+    <div class="hero-stat-row">
+      <div><span class="hero-stat-label">Value generated</span><span class="hero-stat-value">${fmtM(valueM)}</span></div>
+      <div><span class="hero-stat-label">Hours saved (annualized)</span><span class="hero-stat-value">${fmtNum(hours)} hrs</span></div>
+    </div>
+    <div class="note">Value generated = gross value before cost. Full reconciliation → Page 5.</div>`;
+
+  document.getElementById("p1-hero-right").innerHTML = `
+    <div class="card-eyebrow">Payback period</div>
+    <div class="hero-value-row"><span class="figure-secondary">${payback}</span><span class="figure-unit">months</span></div>
+    <div class="note">Time to recoup total investment from net value generated, measured from go-live (month 0).</div>
+    <hr class="divider"/>
+    <div class="card-eyebrow">Total AI investment (TCO, annualized)</div>
+    <div class="hero-value-row"><span style="font-size:24px; font-weight:750; letter-spacing:-0.02em; font-family:var(--font-mono);">${fmtM(costM)}</span></div>
+    <div class="note">${isAll ? "License $2.4M · Token/infra $0.68M · Setup $0.41M · Training $0.26M · Support $0.19M · Risk/rework $0.14M" : "Net value "+fmtM(netM)+" on "+fmtM(costM)+" department cost."}</div>`;
+
+  document.getElementById("p1-kpi-row").innerHTML = `
+    <div class="card kpi-tile"><div class="kpi-label">Availability — apps provisioned</div><div class="kpi-value-row"><span class="kpi-value">${availability}%</span></div><div class="kpi-foot"><span class="note">${isAll?"1,860 / 2,000 eligible employees":fmtNum(d.eligible)+" eligible employees"}</span></div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Adoption — monthly active users</div><div class="kpi-value-row"><span class="kpi-value">${adoption}%</span></div><div class="kpi-foot"><span class="note">${isAll?"1,240 MAU · stickiness 33%":Math.round(d.eligible*adoption/100)+" active users"}</span></div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Efficiency — hrs saved / active user / mo</div><div class="kpi-value-row"><span class="kpi-value">${efficiency}</span></div><div class="kpi-foot"><span class="note">${isAll?"68% of saved time reallocated":"annualizes to "+fmtNum(hours)+" hrs"}</span></div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Departments below target ROI</div><div class="kpi-value-row"><span class="kpi-value">${belowTarget} <span style="font-size:14px; color:var(--ink-muted);">of 15</span></span></div><div class="kpi-foot"><a class="card-link" href="#" data-goto="p3">Review on Page 3 →</a></div></div>`;
+  document.querySelectorAll("#p1-kpi-row [data-goto]").forEach(el=>el.addEventListener("click",e=>{e.preventDefault(); showPage("p3");}));
+
+  const top5 = DEPARTMENTS.slice(0,5);
+  const needsExpand = state.p1ShowAll || (!isAll && DEPARTMENTS.findIndex(x=>x.id===state.p1Dept) >= 5);
+  const listDepts = needsExpand ? DEPARTMENTS : top5;
+  document.getElementById("p1-dept-sub").textContent = "By ROI %, company avg "+COMPANY.roi+"%";
+  document.getElementById("p1-dept-list").innerHTML = listDepts.map((x,i)=>`
+    <div class="bar-row clickable ${i===0?'lead':''} ${x.id===state.p1Dept?'selected':''}" data-dept="${x.id}">
+      <span class="bar-rank">${String(x.rank).padStart(2,"0")}</span>
+      <div class="bar-main"><div class="bar-label-row"><span class="bar-label">${esc(x.name)}</span><span class="bar-label-meta">${fmtNum(x.eligible)} eligible</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(6,x.roi/DEPARTMENTS[0].roi*100)}%; background:${i===0?'var(--accent)':'var(--seq-450)'};"></div></div></div>
+      <span class="bar-value">${x.roi}%</span>
+    </div>`).join("");
+  document.querySelectorAll("#p1-dept-list [data-dept]").forEach(row=>row.addEventListener("click",()=>{
+    state.p1Dept = row.dataset.dept; deptSelect.value = state.p1Dept; renderP1();
+  }));
+  const toggle = document.getElementById("p1-dept-toggle");
+  toggle.classList.toggle("open", needsExpand);
+  toggle.innerHTML = (needsExpand?"Show top 5 only":"Show all 15 departments") + ' <span class="chev">▾</span>';
+  toggle.onclick = ()=>{ state.p1ShowAll = !state.p1ShowAll; renderP1(); };
+
+  const topApps = APPS.filter(a=>a.roi!==null).slice().sort((a,b)=>b.roi-a.roi).slice(0,5);
+  document.getElementById("p1-app-list").innerHTML = topApps.map((a,i)=>`
+    <div class="bar-row ${i===0?'lead':''}">
+      <span class="bar-rank">${String(i+1).padStart(2,"0")}</span>
+      <div class="bar-main"><div class="bar-label-row"><span class="bar-label">${esc(a.name)} <span class="tier tier-${a.tier}" style="margin-left:5px;">T${a.tier}</span></span><span class="bar-label-meta">${a.adoption}% adopted</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(6,a.roi/topApps[0].roi*100)}%; background:${i===0?'var(--accent)':'var(--seq-450)'};"></div></div></div>
+      <span class="bar-value">${a.roi}%</span>
+    </div>`).join("");
+}
+
+/* ===================== PAGE 2 ===================== */
+function segBarHTML(dim, opts, colorMode){
+  return opts.map((o,i)=>{
+    const val = state.p2View==="roi" ? o.roi : o.adoption;
+    const display = val===null ? "—" : val+"%";
+    const width = val===null ? 0 : Math.max(4,val);
+    const color = colorMode==="seq" ? seqColor(i, opts.length) : catColor(i);
+    const active = state.segDim===dim && state.segKey===o.key;
+    return `<div class="bar-row bar-row-compact clickable ${active?'selected':''}" data-dim="${dim}" data-key="${o.key}">
+      <span class="bar-label">${esc(o.label)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${width}%; background:${val===null?'var(--gridline)':color};"></div></div>
+      <span class="bar-value bar-value-sm" ${val===null?'style="color:var(--ink-muted);"':''}>${display}</span>
+    </div>`;
+  }).join("");
+}
+function wireSegBars(container){
+  container.querySelectorAll("[data-dim]").forEach(row=>row.addEventListener("click",()=>{
+    state.segDim = row.dataset.dim; state.segKey = row.dataset.key;
+    syncFilterChips(); renderP2();
+  }));
+}
+function renderP2(){
+  const hasFilter = !!state.segDim;
+  let adoption, roi, netValueLabel, netValue;
+  if(hasFilter){
+    const opt = SEGMENTS[state.segDim].find(o=>o.key===state.segKey);
+    adoption = opt.adoption===null ? "—" : opt.adoption+"%";
+    roi = opt.roi===null ? "—" : opt.roi+"%";
+    netValueLabel = SEG_LABELS[state.segDim]+": "+opt.label;
+    netValue = opt.roi===null ? "—" : fmtM(COMPANY.costM * opt.roi/100 * 0.9);
+  } else {
+    adoption = COMPANY.adoption+"%"; roi = COMPANY.roi+"%"; netValueLabel = "All employees (company-wide default)"; netValue = fmtM(COMPANY.netValueM);
+  }
+  document.getElementById("p2-kpi-row").innerHTML = `
+    <div class="card kpi-tile"><div class="kpi-label">Adoption rate (segment)</div><div class="kpi-value-row"><span class="kpi-value">${adoption}</span></div><div class="note">${netValueLabel}</div></div>
+    <div class="card kpi-tile"><div class="kpi-label">ROI (segment)</div><div class="kpi-value-row"><span class="kpi-value">${roi}</span></div><div class="note">${hasFilter?"vs. "+COMPANY.roi+"% company avg":"reflects current filter"}</div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Net value (segment)</div><div class="kpi-value-row"><span class="kpi-value" style="font-size:19px;">${netValue}</span></div><div class="note">cohort-level aggregate, not per-individual</div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Efficiency (segment)</div><div class="kpi-value-row"><span class="kpi-value">${COMPANY.efficiency}</span></div><div class="note">hrs saved / active user / mo</div></div>`;
+
+  ["seniority","tenure","age","gender","location","employment"].forEach(dim=>{
+    const el = document.getElementById("p2-seg-"+dim);
+    el.innerHTML = segBarHTML(dim, SEGMENTS[dim], SEG_COLOR_MODE[dim]);
+    wireSegBars(el);
+  });
+
+  renderP2Table();
+}
+document.getElementById("p2-view-toggle").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button"); if(!btn) return;
+  state.p2View = btn.dataset.view;
+  document.querySelectorAll("#p2-view-toggle button").forEach(b=>b.classList.toggle("active", b===btn));
+  renderP2();
+});
+document.getElementById("p2-search").addEventListener("input", (e)=>{ state.p2Search = e.target.value.toLowerCase(); renderP2Table(); });
+document.querySelectorAll('#p2 th.sortable').forEach(th=>th.addEventListener("click",()=>{
+  const key = th.dataset.key;
+  if(state.p2Sort.key===key){ state.p2Sort.dir = state.p2Sort.dir==="asc"?"desc":"asc"; }
+  else { state.p2Sort = {key, dir: key==="dept"?"asc":"desc"}; }
+  renderP2Table();
+}));
+function renderP2Table(){
+  let rows = SEGMENT_TABLE.filter(r=> (r.dept+" "+r.seniority+" "+r.tenure).toLowerCase().includes(state.p2Search));
+  const {key,dir} = state.p2Sort;
+  rows = rows.slice().sort((a,b)=>{
+    let av = key==="dept" ? a.dept : a[key], bv = key==="dept" ? b.dept : b[key];
+    if(typeof av==="string") return dir==="asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    return dir==="asc" ? av-bv : bv-av;
+  });
+  document.getElementById("p2-table-body").innerHTML = rows.map(r=>`
+    <tr data-dept-name="${esc(r.dept)}">
+      <td class="name">${esc(r.dept)} · ${esc(r.seniority)} · ${esc(r.tenure)}</td>
+      <td class="num">${r.adoption}%</td><td class="num">${r.prompts}</td><td class="num">${r.hrs}</td>
+      <td class="num" style="font-weight:700;">${r.roi}%</td>
+    </tr>`).join("");
+  document.querySelectorAll('#p2 th.sortable').forEach(th=>{
+    th.querySelector(".sort-arrow")?.remove();
+    if(th.dataset.key===state.p2Sort.key){ th.insertAdjacentHTML("beforeend", `<span class="sort-arrow">${state.p2Sort.dir==="asc"?"▲":"▼"}</span>`); }
+  });
+  document.querySelectorAll("#p2-table-body tr").forEach(tr=>tr.addEventListener("click",()=>{
+    const name = tr.dataset.deptName;
+    const match = DEPARTMENTS.find(d=>name.indexOf(d.name)===0 || d.name.indexOf(name)===0 || d.name===name);
+    if(match){ state.p3Dept = match.id; renderP3(); showPage("p3"); }
+  }));
+}
+
+/* ===================== PAGE 3 ===================== */
+const p3Select = document.getElementById("p3-dept-select");
+p3Select.innerHTML = DEPARTMENTS.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join("");
+p3Select.addEventListener("change", ()=>{ state.p3Dept = p3Select.value; renderP3(); });
+document.getElementById("p3-funnel-toggle").addEventListener("click", ()=>{
+  state.p3FunnelOpen = !state.p3FunnelOpen;
+  document.getElementById("p3-funnel-toggle").classList.toggle("open", state.p3FunnelOpen);
+  document.getElementById("p3-funnel-body").classList.toggle("open", state.p3FunnelOpen);
+});
+
+function renderP3(){
+  const d = deptById(state.p3Dept);
+  p3Select.value = d.id;
+  document.getElementById("p3-rank-chip").innerHTML = `<span class="dot"></span>Rank #${d.rank} of 15 by ROI`;
+
+  const payback = ((d.costK*0.10) / (d.netK/12)).toFixed(1);
+  document.getElementById("p3-kpi-row").innerHTML = `
+    <div class="card kpi-tile"><div class="kpi-label">Department ROI</div><div class="kpi-value-row"><span class="kpi-value">${d.roi}%</span><span class="kpi-delta ${d.roi>=COMPANY.roi?'up-good':'down-bad'}">vs ${COMPANY.roi}% co. avg</span></div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Net value (annualized)</div><div class="kpi-value-row"><span class="kpi-value">${fmtK(d.netK)}</span></div><div class="note">on ${fmtK(d.costK)} dept. cost · payback ${payback} mo</div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Hours saved (annualized)</div><div class="kpi-value-row"><span class="kpi-value">${fmtNum(d.hours)}</span></div><div class="note">hrs / year</div></div>
+    <div class="card kpi-tile"><div class="kpi-label">Employee sentiment (eNPS, AI tools)</div><div class="kpi-value-row"><span class="kpi-value">${d.enps>0?'+':''}${d.enps}</span></div></div>`;
+
+  const mult=[0.62,0.70,0.79,0.87,0.94,1.0];
+  const months=["Feb","Mar","Apr","May","Jun","Jul"];
+  const xs=[30,210,390,570,750,930];
+  const pts = mult.map((m,i)=>{ const val=d.adoption*m; const y=120-(val/100)*110; return xs[i]+","+y.toFixed(1); }).join(" ");
+  const lastY = (120-(d.adoption/100)*110).toFixed(1);
+  document.getElementById("p3-trend-svg").innerHTML = `
+    <g font-size="9" fill="var(--ink-muted)">
+      <line x1="30" y1="10" x2="30" y2="120" stroke="var(--gridline)" stroke-width="1"/>
+      <line x1="30" y1="120" x2="930" y2="120" stroke="var(--gridline)" stroke-width="1"/>
+      <line x1="30" y1="65" x2="930" y2="65" stroke="var(--gridline)" stroke-width="1"/>
+      <text x="4" y="123">0%</text><text x="0" y="68">50%</text><text x="0" y="14">100%</text>
+    </g>
+    <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${mult.map((m,i)=>{ const val=Math.round(d.adoption*m); const y=(120-(val/100)*110).toFixed(1); return `<circle cx="${xs[i]}" cy="${y}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"><title>${months[i]}: ${val}% adoption</title></circle>`; }).join("")}
+    <text x="${xs[5]-46}" y="${lastY-8}" font-size="11" font-weight="700" fill="var(--accent)">${d.adoption}%</text>
+    <g font-size="9" fill="var(--ink-muted)" text-anchor="middle">${xs.map((x,i)=>`<text x="${x}" y="134">${months[i]}</text>`).join("")}</g>`;
+
+  const df = funnelFor(d);
+  const stages = ["Availability","Adoption","Utilization","Efficiency","Outcomes"];
+  document.getElementById("p3-funnel-bars").innerHTML = stages.map((s,i)=>`
+    <div class="bar-row" style="grid-template-columns:96px 1fr 44px;">
+      <span class="bar-label">${s}</span>
+      <div><div class="bar-track" style="height:9px;"><div class="bar-fill" style="width:${df[i]}%; background:var(--accent);"></div></div>
+      <div class="bar-track" style="height:9px; margin-top:3px;"><div class="bar-fill" style="width:${COMPANY_FUNNEL[i]}%; background:var(--ink-muted); opacity:0.5;"></div></div></div>
+      <span class="bar-value" style="font-size:11px;">${df[i]}/${COMPANY_FUNNEL[i]}</span>
+    </div>`).join("");
+
+  document.getElementById("p3-outcomes-title").textContent = "Outcome KPIs — "+d.name;
+  document.getElementById("p3-outcomes-body").innerHTML = d.outcomes.map(o=>`
+    <tr><td class="name">${esc(o[0])}</td><td class="num">${esc(o[1])}</td><td class="num">${esc(o[2])}</td>
+    <td class="num" style="color:var(--status-good-text); font-weight:700;">${esc(o[3])}</td>
+    <td><span class="chip chip-neutral">${esc(o[4])}</span></td></tr>`).join("");
+
+  document.getElementById("p3-apps-list").innerHTML = d.apps.map(a=>`
+    <div class="bar-row" style="grid-template-columns:1fr auto;">
+      <div class="bar-main"><div class="bar-label-row"><span class="bar-label">${esc(a[0])}</span></div>
+      <div class="bar-track" style="height:8px;"><div class="bar-fill" style="width:${a[1]}%; background:var(--seq-450);"></div></div></div>
+      <span class="bar-value">${a[1]}%</span>
+    </div>`).join("");
+}
+
+/* ===================== PAGE 4 ===================== */
+function p4Points(){
+  return APPS.map(a=>{
+    const roi = a.roi===null ? 4 : a.roi;
+    const x = 50 + (a.adoption/100)*560;
+    const y = 20 + ((100-roi)/120)*200;
+    const r = Math.max(6, Math.min(20, 6+Math.sqrt(a.license||4)*0.6));
+    const color = a.tier===1?"var(--seq-650)":a.tier===2?"var(--seq-350)":"var(--seq-150)";
+    return {a,x,y,r,color};
+  });
+}
+function renderP4Scatter(){
+  const pts = p4Points();
+  document.getElementById("p4-scatter-svg").innerHTML = `
+    <line x1="50" y1="20" x2="50" y2="220" stroke="var(--gridline)" stroke-width="1"/>
+    <line x1="50" y1="220" x2="610" y2="220" stroke="var(--gridline)" stroke-width="1"/>
+    <line x1="50" y1="186.7" x2="610" y2="186.7" stroke="var(--gridline)" stroke-width="1"/>
+    <g font-size="9.5" fill="var(--ink-muted)">
+      <text x="4" y="223">−20%</text><text x="4" y="190">ROI 0%</text><text x="4" y="24">100%</text>
+      <text x="50" y="238" text-anchor="middle">0%</text><text x="330" y="238" text-anchor="middle">Adoption →</text><text x="600" y="238" text-anchor="middle">100%</text>
+    </g>
+    ${pts.map(p=>`
+      <circle class="p4-point" data-app="${esc(p.a.name)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}" fill="${p.color}" fill-opacity="0.85" style="cursor:pointer;">
+        <title>${esc(p.a.name)} — Adoption ${p.a.adoption}%, ROI ${p.a.roi===null?"n/a":p.a.roi+"%"}, License ${fmtK(p.a.license)}</title>
+      </circle>
+      <text x="${p.x.toFixed(1)}" y="${(p.y-p.r-4).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="${p.a.status==='serious'||p.a.status==='critical'?'var(--status-'+p.a.status+')':'var(--ink-secondary)'}" font-weight="${p.a.tier===1?700:500}">${esc(p.a.name.length>16?p.a.name.slice(0,14)+"…":p.a.name)}</text>
+    `).join("")}`;
+  document.querySelectorAll(".p4-point").forEach(pt=>pt.addEventListener("click",()=>{
+    const row = document.querySelector(`#p4-table-body tr[data-app="${CSS.escape(pt.dataset.app)}"]`);
+    if(row){ row.scrollIntoView({behavior:"smooth", block:"center"}); row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash"); }
+  }));
+}
+document.getElementById("p4-search").addEventListener("input",(e)=>{ state.p4Search = e.target.value.toLowerCase(); renderP4Table(); });
+document.querySelectorAll('#p4 th.sortable').forEach(th=>th.addEventListener("click",()=>{
+  const key = th.dataset.key;
+  if(state.p4Sort.key===key){ state.p4Sort.dir = state.p4Sort.dir==="asc"?"desc":"asc"; }
+  else { state.p4Sort = {key, dir:"desc"}; }
+  renderP4Table();
+}));
+function renderP4Table(){
+  let rows = APPS.filter(a=>a.name.toLowerCase().includes(state.p4Search));
+  const {key,dir} = state.p4Sort;
+  rows = rows.slice().sort((a,b)=>{
+    const map = {name:"name",license:"license",adoption:"adoption",prompts:"prompts",hours:"hours",roi:"roi"};
+    let av=a[map[key]], bv=b[map[key]];
+    if(av===null) av = -Infinity; if(bv===null) bv = -Infinity;
+    if(typeof av==="string") return dir==="asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    return dir==="asc" ? av-bv : bv-av;
+  });
+  document.getElementById("p4-table-body").innerHTML = rows.map(a=>`
+    <tr data-app="${esc(a.name)}">
+      <td class="name">${esc(a.name)}<span class="sub">${esc(a.dept)}</span></td>
+      <td><span class="tier tier-${a.tier}">T${a.tier}</span></td>
+      <td class="num">${a.license?fmtK(a.license):"$0*"}</td>
+      <td class="num">${a.adoption}%${a.roi===null?"*":""}</td>
+      <td class="num">${a.prompts===null?"n/a":a.prompts}</td>
+      <td class="num">${a.hours===null?"n/a":fmtNum(a.hours)}</td>
+      <td class="num" style="font-weight:700; ${a.roi!==null && a.roi<0 ? 'color:var(--status-critical);':''}">${a.roi===null?"n/a":a.roi+"%"}</td>
+      <td><span class="chip chip-${a.status}"><span class="dot"></span>${esc(a.statusLabel)}</span></td>
+    </tr>`).join("");
+  document.querySelectorAll('#p4 th.sortable').forEach(th=>{
+    th.querySelector(".sort-arrow")?.remove();
+    if(th.dataset.key===state.p4Sort.key){ th.insertAdjacentHTML("beforeend", `<span class="sort-arrow">${state.p4Sort.dir==="asc"?"▲":"▼"}</span>`); }
+  });
+}
+
+/* ===================== PAGE 5 ===================== */
+function renderP5Counterfactual(){
+  const months=["Feb","Mar","Apr","May","Jun","Jul"];
+  const xs=[34,211,388,565,742,930];
+  const high=[100,105,111,118,127,140];
+  const ctrl=[100,102,104,106,109,116];
+  function toY(v){ return 140 - ((v-90)/60)*130; }
+  const highPts = xs.map((x,i)=>x+","+toY(high[i]).toFixed(1)).join(" ");
+  const ctrlPts = xs.map((x,i)=>x+","+toY(ctrl[i]).toFixed(1)).join(" ");
+  document.getElementById("p5-counterfactual-svg").innerHTML = `
+    <g font-size="9.5" fill="var(--ink-muted)">
+      <line x1="34" y1="10" x2="34" y2="140" stroke="var(--gridline)" stroke-width="1"/>
+      <line x1="34" y1="140" x2="930" y2="140" stroke="var(--gridline)" stroke-width="1"/>
+      <text x="0" y="143">idx 90</text><text x="0" y="78">120</text><text x="0" y="14">150</text>
+    </g>
+    <polyline points="${highPts}" fill="none" stroke="var(--cat-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="${ctrlPts}" fill="none" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${xs.map((x,i)=>`<circle cx="${x}" cy="${toY(high[i]).toFixed(1)}" r="4" fill="var(--cat-1)" stroke="var(--surface)" stroke-width="2"><title>${months[i]} — High-adoption cohort: idx ${high[i]}</title></circle>`).join("")}
+    ${xs.map((x,i)=>`<circle cx="${x}" cy="${toY(ctrl[i]).toFixed(1)}" r="4" fill="var(--ink-muted)" stroke="var(--surface)" stroke-width="2"><title>${months[i]} — Matched control cohort: idx ${ctrl[i]}</title></circle>`).join("")}
+    <text x="${xs[5]-40}" y="${toY(high[5])-10}" font-size="10" font-weight="700" fill="var(--cat-1)">+40 idx</text>
+    <text x="${xs[5]-40}" y="${toY(ctrl[5])+16}" font-size="10" font-weight="700" fill="var(--ink-secondary)">+16 idx</text>
+    <g font-size="9" fill="var(--ink-muted)" text-anchor="middle">${xs.map((x,i)=>`<text x="${x}" y="154">${months[i]}</text>`).join("")}</g>`;
+}
+
+/* ===================== INIT ===================== */
+renderP1(); renderP2(); renderP3(); renderP4Scatter(); renderP4Table(); renderP5Counterfactual();
+})();
+</script>
+</body>
+</html>
